@@ -1,6 +1,6 @@
 name: studip
 description: A simple-to-use wrapper for Stud.IP's RestAPI service in Dart.
-version: 1.0.0
+version: 1.0.1
 #homepage: https://github.com/ThexXTURBOXx/dart-studip
 repository: https://github.com/ThexXTURBOXx/dart-studip
 issue_tracker: https://github.com/ThexXTURBOXx/dart-studip/issues

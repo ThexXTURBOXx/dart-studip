@@ -9,7 +9,7 @@ Add to ``pubspec.yaml``:
 
 ```yaml
 dependencies:
-  studip: ^1.0.0
+  studip: ^1.0.1
 ```
 
 A simple usage example:
