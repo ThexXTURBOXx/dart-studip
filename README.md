@@ -1,5 +1,9 @@
 # Stud.IP
 
+<p align="center">
+  <a href="https://travis-ci.com/ThexXTURBOXx/dart-studip"><img src="https://travis-ci.com/ThexXTURBOXx/dart-studip.svg?branch=master"></a>
+</p>
+
 A library which provides simple access to Stud.IP's RestAPI services using
  OAuth 1 authentication for Dart.
 
