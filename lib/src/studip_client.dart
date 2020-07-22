@@ -55,7 +55,7 @@ class StudIPClient {
   /// The first step in the OAuth authentication process. Returns the
   /// authorization URL after it is generated. This process is async.
   Future<String> getAuthorizationUrl([String callback]) async {
-    var res = await _auth.requestTemporaryCredentials(callback);
+    final res = await _auth.requestTemporaryCredentials(callback);
     _credentials = res.credentials;
     return _auth.getResourceOwnerAuthorizationURI(res.credentials.token);
   }
@@ -66,7 +66,8 @@ class StudIPClient {
   /// process is async. After completion, Stud.IP's RestAPI can be fully
   /// accessed.
   Future<void> retrieveAccessToken(String verifierToken) async {
-    var res = await _auth.requestTokenCredentials(_credentials, verifierToken);
+    final res =
+        await _auth.requestTokenCredentials(_credentials, verifierToken);
     _credentials = res.credentials;
     client = oauth1.Client(
         _platform.signatureMethod, _clientCredentials, res.credentials);
