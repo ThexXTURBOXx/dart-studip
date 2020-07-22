@@ -1,5 +1,7 @@
 library studip_client;
 
+import 'dart:convert';
+
 import 'package:oauth1/oauth1.dart' as oauth1;
 
 /// Provides simple-to-use access to Stud.IP's RestAPI over OAuth 1.
@@ -13,18 +15,26 @@ class StudIPClient {
   /// credentials (is null until ``retrieveAccessToken`` is called).
   oauth1.Client client;
 
-  /// The ``baseUrl`` points to the API endpoint base url. The ``consumerKey``
+  /// The base URL for access to the RestAPI. Optional argument, but it is
+  /// highly advised to specify due to enabling the proper use of all ``api*``
+  /// methods in this class.
+  String apiBaseUrl;
+
+  /// The ``oAuthBaseUrl`` points to the OAuth base url. The ``consumerKey``
   /// and ``consumerSecret`` are the OAuth consumer key and secret. These are
   /// the three required arguments. If you already have an access token and
   /// access token secret, you can pass them in as the optional arguments
-  /// ``accessToken`` and ``accessTokenSecret``.
-  StudIPClient(String baseUrl, String consumerKey, String consumerSecret,
-      [String accessToken, String accessTokenSecret]) {
+  /// ``accessToken`` and ``accessTokenSecret``. The API endpoint can be
+  /// specified using the optional argument ``apiBaseUrl``. This eases
+  /// requesting data from the API due to enabling the use of the ``api*``
+  /// methods in this class.
+  StudIPClient(String oAuthBaseUrl, String consumerKey, String consumerSecret,
+      {String accessToken, String accessTokenSecret, this.apiBaseUrl}) {
     _clientCredentials = oauth1.ClientCredentials(consumerKey, consumerSecret);
     _platform = oauth1.Platform(
-        baseUrl + '/oauth/request_token',
-        baseUrl + '/oauth/authorize',
-        baseUrl + '/oauth/access_token',
+        oAuthBaseUrl + '/oauth/request_token',
+        oAuthBaseUrl + '/oauth/authorize',
+        oAuthBaseUrl + '/oauth/access_token',
         oauth1.SignatureMethods.hmacSha1);
     _auth = oauth1.Authorization(_clientCredentials, _platform);
     _credentials = oauth1.Credentials(accessToken, accessTokenSecret);
@@ -66,5 +76,17 @@ class StudIPClient {
   /// body is returned as a future String instance.
   Future<String> get(String url) async {
     return (await client.get(url)).body;
+  }
+
+  /// Returns the body of the given ``endpoint`` in the specified RestAPI. To
+  /// proper use, specify ``apiBaseUrl``.
+  Future<String> apiGet(String endpoint) async {
+    return get(apiBaseUrl + endpoint);
+  }
+
+  /// Returns the body decoded as JSON of the given ``endpoint`` in the
+  /// specified RestAPI. To proper use, specify ``apiBaseUrl``.
+  Future<dynamic> apiGetJson(String endpoint) async {
+    return json.decode(await apiGet(endpoint));
   }
 }

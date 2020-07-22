@@ -1,14 +1,15 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:studip/studip.dart' as studip;
 
+/// A new way (introduced in 1.0.1) to retrieve data with even less code!
 void main() {
   // Initialize client
   var client = studip.StudIPClient(
       'https://studip.uni-passau.de/studip/dispatch.php/api',
       'CONSUMER_KEY',
-      'CONSUMER_SECRET');
+      'CONSUMER_SECRET',
+      apiBaseUrl: 'https://studip.uni-passau.de/studip/api.php/');
   // TODO Replace CONSUMER_KEY and CONSUMER_SECRET
   client.getAuthorizationUrl('example://oauth_callback').then((url) {
     // Get verifier by calling the returned link and approve access
@@ -21,10 +22,9 @@ void main() {
     return client.retrieveAccessToken(verifier);
   }).then((v) {
     // Example call
-    return client.get('https://studip.uni-passau.de/studip/api.php/user');
-  }).then((body) {
+    return client.apiGetJson('user');
+  }).then((decoded) {
     // Example parsing of response
-    final decoded = json.decode(body);
     print(decoded['name']['formatted']);
   });
 }
