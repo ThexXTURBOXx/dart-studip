@@ -1,3 +1,7 @@
+## 1.0.2
+
+- Fixed authentication process with given token and secret
+
 ## 1.0.1
 
 - Better API usage through api* functions

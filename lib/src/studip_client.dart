@@ -38,6 +38,8 @@ class StudIPClient {
         oauth1.SignatureMethods.hmacSha1);
     _auth = oauth1.Authorization(_clientCredentials, _platform);
     _credentials = oauth1.Credentials(accessToken, accessTokenSecret);
+    client = oauth1.Client(
+        _platform.signatureMethod, _clientCredentials, _credentials);
   }
 
   /// Returns the set consumer key.
@@ -76,7 +78,11 @@ class StudIPClient {
   /// Returns the body of the given ``url``. This process is async, thus the
   /// body is returned as a future String instance.
   Future<String> get(String url) async {
-    return (await client.get(url)).body;
+    final res = await client.get(url);
+    if (isErrorCode(res.statusCode)) {
+      throw Exception('Session is invalid!');
+    }
+    return res.body;
   }
 
   /// Returns the body of the given ``endpoint`` in the specified RestAPI. To
@@ -89,5 +95,11 @@ class StudIPClient {
   /// specified RestAPI. To proper use, specify ``apiBaseUrl``.
   Future<dynamic> apiGetJson(String endpoint) async {
     return json.decode(await apiGet(endpoint));
+  }
+
+  /// Returns whether the given status code should be handled as a error code,
+  /// thus indicating, that the session is invalid and should be renewed.
+  bool isErrorCode(int statusCode) {
+    return statusCode == 401 || statusCode == 500;
   }
 }
