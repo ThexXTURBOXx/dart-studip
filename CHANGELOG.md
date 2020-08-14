@@ -1,3 +1,7 @@
+## 1.0.3
+
+- Eased detection of invalid sessions
+
 ## 1.0.2
 
 - Fixed authentication process with given token and secret
