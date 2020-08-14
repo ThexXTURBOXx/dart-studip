@@ -80,7 +80,7 @@ class StudIPClient {
   Future<String> get(String url) async {
     final res = await client.get(url);
     if (isErrorCode(res.statusCode)) {
-      throw Exception('Session is invalid!');
+      throw SessionInvalidException(res.statusCode);
     }
     return res.body;
   }
@@ -102,4 +102,17 @@ class StudIPClient {
   bool isErrorCode(int statusCode) {
     return statusCode == 401 || statusCode == 500;
   }
+}
+
+/// Thrown when the currently used session is invalid and a new client should be
+/// constructed.
+class SessionInvalidException implements Exception {
+  final int _errorCode;
+
+  /// Constructs a new Exception indicating that the currently used session is
+  /// invalid and a new client should be constructed.
+  const SessionInvalidException(this._errorCode);
+
+  /// Returns the HTTP error code received.
+  int get errorCode => _errorCode;
 }
