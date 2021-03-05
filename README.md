@@ -13,7 +13,7 @@ Add to ``pubspec.yaml``:
 
 ```yaml
 dependencies:
-  studip: ^1.0.2
+  studip: ^2.0.0
 ```
 
 A simple usage example:
@@ -34,10 +34,10 @@ void main() {
   client.getAuthorizationUrl('example://oauth_callback').then((String url) {
     // Get verifier by calling the returned link and approve access
     print('Open URL in browser: $url');
-    final uri = stdin.readLineSync();
+    final uri = stdin.readLineSync()!;
 
     // Retrieve permanent token
-    final verifier = Uri.parse(uri).queryParameters['oauth_verifier'];
+    final verifier = Uri.parse(uri).queryParameters['oauth_verifier'] ?? '';
     return client.retrieveAccessToken(verifier);
   }).then((void v) {
     // Example call
@@ -71,9 +71,9 @@ void main() {
   client.getAuthorizationUrl('example://oauth_callback').then((String url) {
     // Get verifier by calling the returned link and approve access
     return FlutterWebAuth.authenticate(url: url, callbackUrlScheme: 'example');
-  }).then((res) {
+  }).then((uri) {
     // Retrieve permanent token
-    final verifier = Uri.parse(uri).queryParameters['oauth_verifier'];
+    final verifier = Uri.parse(uri).queryParameters['oauth_verifier'] ?? '';
     return client.retrieveAccessToken(verifier);
   }).then((void v) {
     // Example call

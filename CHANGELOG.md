@@ -1,3 +1,7 @@
+## 2.0.0-nullsafety.0
+
+- Enable sound null-safety (**Breaking Change:** Only SDK `>= 2.12.0` allowed)
+
 ## 1.0.3
 
 - Eased detection of invalid sessions

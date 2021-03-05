@@ -13,11 +13,11 @@ void main() {
   client.getAuthorizationUrl('example://oauth_callback').then((String url) {
     // Get verifier by calling the returned link and approve access
     print('Open URL in browser: $url');
-    final uri = stdin.readLineSync();
-    // or e.g. using FlutterWebAuth.authenticate(url: url, callbackUrlScheme: 'example');
+    final uri = stdin.readLineSync()!;
+    // FlutterWebAuth.authenticate(url: url, callbackUrlScheme: 'example');
 
     // Retrieve permanent token
-    final verifier = Uri.parse(uri).queryParameters['oauth_verifier'];
+    final verifier = Uri.parse(uri).queryParameters['oauth_verifier'] ?? '';
     return client.retrieveAccessToken(verifier);
   }).then((void v) {
     // Example call
