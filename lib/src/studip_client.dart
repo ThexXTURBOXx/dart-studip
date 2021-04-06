@@ -6,9 +6,9 @@ import 'package:oauth1/oauth1.dart' as oauth1;
 
 /// Provides simple-to-use access to Stud.IP's RestAPI over OAuth 1.
 class StudIPClient {
-  late oauth1.ClientCredentials _clientCredentials;
+  final oauth1.ClientCredentials _clientCredentials;
+  final oauth1.Platform _platform;
   late oauth1.Credentials _credentials;
-  late oauth1.Platform _platform;
   late oauth1.Authorization _auth;
 
   /// The client with access to the RestAPI using the retrieved OAuth
@@ -29,19 +29,20 @@ class StudIPClient {
   /// requesting data from the API due to enabling the use of the ``api*``
   /// methods in this class.
   StudIPClient(String oAuthBaseUrl, String consumerKey, String consumerSecret,
-      {String? accessToken, String? accessTokenSecret, this.apiBaseUrl}) {
-    _clientCredentials = oauth1.ClientCredentials(consumerKey, consumerSecret);
-    _platform = oauth1.Platform(
-        oAuthBaseUrl + '/oauth/request_token',
-        oAuthBaseUrl + '/oauth/authorize',
-        oAuthBaseUrl + '/oauth/access_token',
-        oauth1.SignatureMethods.hmacSha1);
+      {String? accessToken, String? accessTokenSecret, this.apiBaseUrl})
+      : _clientCredentials =
+            oauth1.ClientCredentials(consumerKey, consumerSecret),
+        _platform = oauth1.Platform(
+            oAuthBaseUrl + '/oauth/request_token',
+            oAuthBaseUrl + '/oauth/authorize',
+            oAuthBaseUrl + '/oauth/access_token',
+            oauth1.SignatureMethods.hmacSha1) {
     _auth = oauth1.Authorization(_clientCredentials, _platform);
     if (accessToken != null && accessTokenSecret != null) {
       _credentials = oauth1.Credentials(accessToken, accessTokenSecret);
+      client = oauth1.Client(
+          _platform.signatureMethod, _clientCredentials, _credentials);
     }
-    client = oauth1.Client(
-        _platform.signatureMethod, _clientCredentials, _credentials);
   }
 
   /// Returns the set consumer key.
