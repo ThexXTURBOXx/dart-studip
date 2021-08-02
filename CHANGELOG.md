@@ -1,3 +1,7 @@
+## 2.1.0
+
+- Added more HTTP methods
+
 ## 2.0.0
 
 - Stable sound null-safety release with some fixed bugs
