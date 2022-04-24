@@ -1,3 +1,7 @@
+## 2.1.1
+
+- Migrate to `flutter_lints`
+
 ## 2.1.0
 
 - Added more HTTP methods
