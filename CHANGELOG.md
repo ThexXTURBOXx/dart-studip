@@ -1,3 +1,7 @@
+## 2.1.2
+
+-Support newer Dart and `http` versions
+
 ## 2.1.1
 
 - Migrate to `flutter_lints`
