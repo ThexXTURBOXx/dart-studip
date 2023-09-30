@@ -18,7 +18,7 @@ void main() {
         // Get verifier by calling the returned link and approve access
         log('Open URL in browser: $url');
         final uri = stdin.readLineSync()!;
-        // FlutterWebAuth.authenticate(url: url, callbackUrlScheme: 'example');
+        // FlutterWebAuth2.authenticate(url: url, callbackUrlScheme: 'example');
 
         // Retrieve permanent token
         final verifier = Uri.parse(uri).queryParameters['oauth_verifier'] ?? '';

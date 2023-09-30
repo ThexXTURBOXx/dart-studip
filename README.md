@@ -9,7 +9,7 @@ A library which provides simple access to Stud.IP's RestAPI services using
 
 ## Usage
 
-Add to ``pubspec.yaml``:
+Add to `pubspec.yaml`:
 
 ```yaml
 dependencies:
@@ -51,14 +51,14 @@ void main() {
 
 ## Additional compatibilities
 
-This library features additional compatibility for the ``flutter_web_auth`` library.
+This library features additional compatibility for the `flutter_web_auth_2` library.
 
 You can use both libraries together like this:
 ```dart
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter_web_auth/flutter_web_auth.dart';
+import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:studip/studip.dart' as studip;
 
 void main() {
@@ -70,7 +70,7 @@ void main() {
       apiBaseUrl: 'https://studip.uni-passau.de/studip/api.php/');
   client.getAuthorizationUrl('example://oauth_callback').then((String url) {
     // Get verifier by calling the returned link and approve access
-    return FlutterWebAuth.authenticate(url: url, callbackUrlScheme: 'example');
+    return FlutterWebAuth2.authenticate(url: url, callbackUrlScheme: 'example');
   }).then((uri) {
     // Retrieve permanent token
     final verifier = Uri.parse(uri).queryParameters['oauth_verifier'] ?? '';
@@ -87,6 +87,4 @@ void main() {
 
 ## Features and bugs
 
-Please file feature requests and bugs at the [issue tracker][tracker].
-
-[tracker]: https://github.com/ThexXTURBOXx/dart-studip/issues
+Please file feature requests and bugs at the [issue tracker](https://github.com/ThexXTURBOXx/dart-studip/issues).
