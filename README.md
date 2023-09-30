@@ -1,7 +1,7 @@
 # Stud.IP
 
 <p align="center">
-  <a href="https://travis-ci.com/ThexXTURBOXx/dart-studip"><img src="https://travis-ci.com/ThexXTURBOXx/dart-studip.svg?branch=master"></a>
+  <a href="https://github.com/ThexXTURBOXx/dart-studip/actions/workflows/ci.yml"><img src="https://github.com/ThexXTURBOXx/dart-studip/actions/workflows/ci.yml/badge.svg"></a>
 </p>
 
 A library which provides simple access to Stud.IP's RestAPI services using

@@ -1,4 +1,0 @@
-language: dart
-
-script:
-  - dartanalyzer --fatal-warnings --fatal-lints .
