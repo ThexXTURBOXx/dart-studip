@@ -1,6 +1,11 @@
+## 2.1.3
+
+- Migrate to more permissive MIT License
+- Add more entries in pubspec
+
 ## 2.1.2
 
--Support newer Dart and `http` versions
+- Support newer Dart and `http` versions
 
 ## 2.1.1
 
