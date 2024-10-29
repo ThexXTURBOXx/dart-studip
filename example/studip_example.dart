@@ -1,32 +1,24 @@
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:studip/studip.dart' as studip;
 
 /// How to retrieve data very simply
 void main() {
-  // Initialize client
-  final client = studip.StudIPClient(
-    'https://studip.uni-passau.de/studip/dispatch.php/api',
-    'CONSUMER_KEY',
-    'CONSUMER_SECRET',
-    apiBaseUrl: 'https://studip.uni-passau.de/studip/api.php/',
-  );
-  client
-      .getAuthorizationUrl('example://oauth_callback')
-      .then((url) {
-        // Get verifier by calling the returned link and approve access
-        log('Open URL in browser: $url');
-        final uri = stdin.readLineSync()!;
-        // FlutterWebAuth2.authenticate(url: url, callbackUrlScheme: 'example');
+  const studIpProviderUrl = 'http://studip.uni-passau.de/studip/';
+  const apiBaseUrl = '${studIpProviderUrl}jsonapi.php/v1/';
 
-        // Retrieve permanent token
-        final verifier = Uri.parse(uri).queryParameters['oauth_verifier'] ?? '';
-        return client.retrieveAccessToken(verifier);
-      })
-      .then((v) => client.apiGetJson('user'))
-      .then((dynamic decoded) {
-        // Example parsing of response
-        log('${decoded['name']['formatted']}');
-      });
+  // Initialize client and log in
+  final client = studip.StudIPClient(
+    oAuthBaseUrl: studIpProviderUrl,
+    redirectUri: 'example://oauth_callback',
+    customUriScheme: 'example',
+    clientId: 'CLIENT_ID',
+    //clientSecret: 'CLIENT_SECRET_IF_NEEDED',
+    apiBaseUrl: apiBaseUrl,
+  );
+
+  client.apiGetJson('users/me').then((dynamic decoded) {
+    // Example parsing of response
+    log('${decoded['data']['attributes']['formatted-name']}');
+  });
 }

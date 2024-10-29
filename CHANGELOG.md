@@ -1,3 +1,7 @@
+## 3.0.0-alpha.0
+
+- Migrate to OAuth 2.0 and `oauth2_client`
+
 ## 2.1.3
 
 - Migrate to more permissive MIT License

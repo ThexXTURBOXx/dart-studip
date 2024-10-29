@@ -1,174 +1,160 @@
-library studip_client;
-
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
-import 'package:oauth1/oauth1.dart' as oauth1;
+import 'package:oauth2_client/interfaces.dart';
+import 'package:oauth2_client/oauth2_helper.dart';
+import 'package:studip/src/studip_oauth2_client.dart';
 
-/// Provides simple-to-use access to Stud.IP's RestAPI over OAuth 1.
+/// Provides simple-to-use access to Stud.IP's JSON:API over OAuth 2.
 class StudIPClient {
-  final oauth1.ClientCredentials _clientCredentials;
-  final oauth1.Platform _platform;
-  late oauth1.Credentials _credentials;
-  late oauth1.Authorization _auth;
+  /// The client with access to the JSON:API using the retrieved OAuth 2.0
+  /// credentials.
+  final OAuth2Helper _client;
 
-  /// The client with access to the RestAPI using the retrieved OAuth
-  /// credentials (is `null` until `retrieveAccessToken` is called).
-  late oauth1.Client _client;
-
-  /// The base URL for access to the RestAPI. Optional argument, but it is
+  /// The base URL for access to the JSON:API. Optional argument, but it is
   /// highly advised to specify due to enabling the proper use of all `api*`
   /// methods in this class.
   final String? apiBaseUrl;
 
-  /// The `oAuthBaseUrl` points to the OAuth base url. The `consumerKey`
-  /// and `consumerSecret` are the OAuth consumer key and secret. These are
-  /// the three required arguments. If you already have an access token and
-  /// access token secret, you can pass them in as the optional arguments
-  /// `accessToken` and `accessTokenSecret`. The API endpoint can be
-  /// specified using the optional argument `apiBaseUrl`. This eases
-  /// requesting data from the API due to enabling the use of the `api*`
-  /// methods in this class.
-  StudIPClient(
-    String oAuthBaseUrl,
-    String consumerKey,
-    String consumerSecret, {
-    String? accessToken,
-    String? accessTokenSecret,
+  /// This is used to fix a 406 error. Without this, Stud.IP behaves weirdly.
+  final Map<String, String> _acceptHeaderFix = {'Accept': '*/*'};
+
+  /// The `oAuthBaseUrl` points to the OAuth base url. The `clientId` and
+  /// `clientSecret` are the OAuth 2.0 client_id and client_secret. These are
+  /// the four required arguments. If you already have a token, you can pass
+  /// them in through the optional `tokenStorage`, together with other settings.
+  /// The API endpoint can be specified using the optional argument
+  /// `apiBaseUrl`. This eases requesting data from the API due to enabling the
+  /// use of the `api*` methods in this class.
+  StudIPClient({
+    required String oAuthBaseUrl,
+    required String redirectUri,
+    required String customUriScheme,
+    required String clientId,
+    String? clientSecret,
+    TokenStorage? tokenStorage,
     this.apiBaseUrl,
-  })  : _clientCredentials =
-            oauth1.ClientCredentials(consumerKey, consumerSecret),
-        _platform = oauth1.Platform(
-          '$oAuthBaseUrl/oauth/request_token',
-          '$oAuthBaseUrl/oauth/authorize',
-          '$oAuthBaseUrl/oauth/access_token',
-          oauth1.SignatureMethods.hmacSha1,
-        ) {
-    _auth = oauth1.Authorization(_clientCredentials, _platform);
-    if (accessToken != null && accessTokenSecret != null) {
-      _credentials = oauth1.Credentials(accessToken, accessTokenSecret);
-      _client = oauth1.Client(
-        _platform.signatureMethod,
-        _clientCredentials,
-        _credentials,
-      );
-    }
-  }
+  }) : _client = OAuth2Helper(
+          StudIPOAuth2Client(
+            baseUrl: oAuthBaseUrl,
+            redirectUri: redirectUri,
+            customUriScheme: customUriScheme,
+          ),
+          clientId: clientId,
+          clientSecret: clientSecret,
+          tokenStorage: tokenStorage,
+        );
 
   /// Returns the current OAuth client.
-  oauth1.Client get client => _client;
+  OAuth2Helper get client => _client;
 
-  /// Returns the set consumer key.
-  String get consumerKey => _clientCredentials.token;
+  /// Returns the set client_id.
+  String get clientId => _client.clientId;
 
-  /// Returns the set consumer secret.
-  String get consumerSecret => _clientCredentials.tokenSecret;
+  /// Returns the set client_secret or `null` if not set.
+  String? get consumerSecret => _client.clientSecret;
 
-  /// Returns the retrieved access token.
-  String get accessToken => _credentials.token;
+  Future<String?> getToken() async => (await client.getToken())?.accessToken;
 
-  /// Returns the retrieved access token secret.
-  String get accessTokenSecret => _credentials.tokenSecret;
+  Future<Map<String, String>> signHeaders([
+    Map<String, String>? headers,
+  ]) async =>
+      {'Authorization': 'Bearer ${await getToken()}', ...(headers ?? {})};
 
-  /// The first step in the OAuth authentication process. Returns the
-  /// authorization URL after it is generated. This process is async.
-  Future<String> getAuthorizationUrl([String? callback]) async {
-    final res = await _auth.requestTemporaryCredentials(callback);
-    _credentials = res.credentials;
-    return _auth.getResourceOwnerAuthorizationURI(res.credentials.token);
-  }
-
-  /// The second step in the OAuth authentication process. A permanent access
-  /// token is retrieved and saved. Requires a `verifierToken`, which has
-  /// been generated using the URL, retrieved in `getAuthorizationUrl`. This
-  /// process is async. After completion, Stud.IP's RestAPI can be fully
-  /// accessed.
-  Future<void> retrieveAccessToken(String verifierToken) async {
-    final res =
-        await _auth.requestTokenCredentials(_credentials, verifierToken);
-    _credentials = res.credentials;
-    _client = oauth1.Client(
-      _platform.signatureMethod,
-      _clientCredentials,
-      res.credentials,
-    );
-  }
-
-  /// Returns the body of the given `url` after a GET request. This process
-  /// is async, thus the body is returned as a future String instance.
-  Future<String> get(String url, {Map<String, String>? headers}) async =>
-      getBody(Uri.parse(url), headers: headers);
+  /// Returns the streamed response after executing the given `request`.
+  /// This process is async, thus the streamed response is returned as a future
+  /// streamed response instance. For authentication, use in conjunction with
+  /// [].
+  Future<http.StreamedResponse> send(http.BaseRequest request) async =>
+      _client.send(request);
 
   /// Returns the body of the given `url` after a POST request. This process
   /// is async, thus the body is returned as a future String instance.
   Future<String> post(String url, {Map<String, String>? headers}) async =>
-      postBody(Uri.parse(url), headers: headers);
+      postBody(url, headers: headers);
 
   /// Returns the body of the given `url` after a PUT request. This process
   /// is async, thus the body is returned as a future String instance.
   Future<String> put(String url, {Map<String, String>? headers}) async =>
-      putBody(Uri.parse(url), headers: headers);
+      putBody(url, headers: headers);
+
+  /// Returns the body of the given `url` after a PATCH request. This process
+  /// is async, thus the body is returned as a future String instance.
+  Future<String> patch(String url, {Map<String, String>? headers}) async =>
+      patchBody(url, headers: headers);
+
+  /// Returns the body of the given `url` after a GET request. This process
+  /// is async, thus the body is returned as a future String instance.
+  Future<String> get(String url, {Map<String, String>? headers}) async =>
+      getBody(url, headers: headers);
 
   /// Returns the body of the given `url` after a DELETE request. This process
   /// is async, thus the body is returned as a future String instance.
   Future<String> delete(String url, {Map<String, String>? headers}) async =>
-      deleteBody(Uri.parse(url), headers: headers);
+      deleteBody(url, headers: headers);
 
-  /// Returns the response of the given `url` after a GET request. This
-  /// process is async, thus the response is returned as a future response
-  /// instance.
-  Future<http.Response> getResponse(
-    Uri uri, {
-    Map<String, String>? headers,
-  }) async =>
-      _client.get(uri, headers: headers);
+  /// Returns the body of the given `url` after a HEAD request. This process
+  /// is async, thus the body is returned as a future String instance.
+  Future<String> head(String url, {Map<String, String>? headers}) async =>
+      headBody(url, headers: headers);
 
   /// Returns the response of the given `url` after a POST request. This
   /// process is async, thus the response is returned as a future response
   /// instance.
   Future<http.Response> postResponse(
-    Uri uri, {
+    String uri, {
     Map<String, String>? headers,
   }) async =>
-      _client.post(uri, headers: headers);
+      _client.post(uri, headers: {..._acceptHeaderFix, ...(headers ?? {})});
 
   /// Returns the response of the given `url` after a PUT request. This
   /// process is async, thus the response is returned as a future response
   /// instance.
   Future<http.Response> putResponse(
-    Uri uri, {
+    String uri, {
     Map<String, String>? headers,
   }) async =>
-      _client.put(uri, headers: headers);
+      _client.put(uri, headers: {..._acceptHeaderFix, ...(headers ?? {})});
+
+  /// Returns the response of the given `url` after a PATCH request. This
+  /// process is async, thus the response is returned as a future response
+  /// instance.
+  Future<http.Response> patchResponse(
+    String uri, {
+    Map<String, String>? headers,
+  }) async =>
+      _client.patch(uri, headers: {..._acceptHeaderFix, ...(headers ?? {})});
+
+  /// Returns the response of the given `url` after a GET request. This
+  /// process is async, thus the response is returned as a future response
+  /// instance.
+  Future<http.Response> getResponse(
+    String uri, {
+    Map<String, String>? headers,
+  }) async =>
+      _client.get(uri, headers: {..._acceptHeaderFix, ...(headers ?? {})});
 
   /// Returns the response of the given `url` after a DELETE request. This
   /// process is async, thus the response is returned as a future response
   /// instance.
   Future<http.Response> deleteResponse(
-    Uri uri, {
+    String uri, {
     Map<String, String>? headers,
   }) async =>
-      _client.delete(uri, headers: headers);
+      _client.delete(uri, headers: {..._acceptHeaderFix, ...(headers ?? {})});
 
-  /// Returns the streamed response after executing the given `request`.
-  /// This process is async, thus the streamed response is returned as a future
-  /// streamed response instance.
-  Future<http.StreamedResponse> send(http.BaseRequest request) async =>
-      _client.send(request);
-
-  /// Returns the body of the given `uri` after a GET request. This process
-  /// is async, thus the body is returned as a future String instance.
-  Future<String> getBody(Uri uri, {Map<String, String>? headers}) async {
-    final res = await getResponse(uri, headers: headers);
-    if (isErrorCode(res.statusCode)) {
-      throw SessionInvalidException(res.statusCode);
-    }
-    return res.body;
-  }
+  /// Returns the response of the given `url` after a HEAD request. This
+  /// process is async, thus the response is returned as a future response
+  /// instance.
+  Future<http.Response> headResponse(
+    String uri, {
+    Map<String, String>? headers,
+  }) async =>
+      _client.head(uri, headers: {..._acceptHeaderFix, ...(headers ?? {})});
 
   /// Returns the body of the given `uri` after a POST request. This process
   /// is async, thus the body is returned as a future String instance.
-  Future<String> postBody(Uri uri, {Map<String, String>? headers}) async {
+  Future<String> postBody(String uri, {Map<String, String>? headers}) async {
     final res = await postResponse(uri, headers: headers);
     if (isErrorCode(res.statusCode)) {
       throw SessionInvalidException(res.statusCode);
@@ -178,8 +164,28 @@ class StudIPClient {
 
   /// Returns the body of the given `uri` after a PUT request. This process
   /// is async, thus the body is returned as a future String instance.
-  Future<String> putBody(Uri uri, {Map<String, String>? headers}) async {
+  Future<String> putBody(String uri, {Map<String, String>? headers}) async {
     final res = await putResponse(uri, headers: headers);
+    if (isErrorCode(res.statusCode)) {
+      throw SessionInvalidException(res.statusCode);
+    }
+    return res.body;
+  }
+
+  /// Returns the body of the given `uri` after a PATCH request. This process
+  /// is async, thus the body is returned as a future String instance.
+  Future<String> patchBody(String uri, {Map<String, String>? headers}) async {
+    final res = await patchResponse(uri, headers: headers);
+    if (isErrorCode(res.statusCode)) {
+      throw SessionInvalidException(res.statusCode);
+    }
+    return res.body;
+  }
+
+  /// Returns the body of the given `uri` after a GET request. This process
+  /// is async, thus the body is returned as a future String instance.
+  Future<String> getBody(String uri, {Map<String, String>? headers}) async {
+    final res = await getResponse(uri, headers: headers);
     if (isErrorCode(res.statusCode)) {
       throw SessionInvalidException(res.statusCode);
     }
@@ -188,8 +194,18 @@ class StudIPClient {
 
   /// Returns the body of the given `uri` after a DELETE request. This process
   /// is async, thus the body is returned as a future String instance.
-  Future<String> deleteBody(Uri uri, {Map<String, String>? headers}) async {
+  Future<String> deleteBody(String uri, {Map<String, String>? headers}) async {
     final res = await deleteResponse(uri, headers: headers);
+    if (isErrorCode(res.statusCode)) {
+      throw SessionInvalidException(res.statusCode);
+    }
+    return res.body;
+  }
+
+  /// Returns the body of the given `uri` after a HEAD request. This process
+  /// is async, thus the body is returned as a future String instance.
+  Future<String> headBody(String uri, {Map<String, String>? headers}) async {
+    final res = await headResponse(uri, headers: headers);
     if (isErrorCode(res.statusCode)) {
       throw SessionInvalidException(res.statusCode);
     }

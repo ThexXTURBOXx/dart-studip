@@ -5,7 +5,7 @@
 </p>
 
 A library which provides simple access to Stud.IP's RestAPI services using
- OAuth 1 authentication for Dart.
+ OAuth 2 authentication for Dart.
 
 ## Usage
 
@@ -13,74 +13,31 @@ Add to `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  studip: ^2.1.3
+  studip: ^3.0.0-alpha.0
 ```
 
 A simple usage example:
 
 ```dart
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:studip/studip.dart' as studip;
 
 void main() {
-  // Initialize client
+  const studIpProviderUrl = 'http://studip.uni-passau.de/studip/';
+  const apiBaseUrl = '${studIpProviderUrl}jsonapi.php/v1/';
+
+  // Initialize client and log in
   final client = studip.StudIPClient(
-      'https://studip.uni-passau.de/studip/dispatch.php/api',
-      'CONSUMER_KEY',
-      'CONSUMER_SECRET',
-      apiBaseUrl: 'https://studip.uni-passau.de/studip/api.php/');
-  client.getAuthorizationUrl('example://oauth_callback').then((String url) {
-    // Get verifier by calling the returned link and approve access
-    print('Open URL in browser: $url');
-    final uri = stdin.readLineSync()!;
+    oAuthBaseUrl: studIpProviderUrl,
+    redirectUri: 'example://oauth_callback',
+    customUriScheme: 'example',
+    clientId: 'CLIENT_ID',
+    //clientSecret: 'CLIENT_SECRET_IF_NEEDED',
+    apiBaseUrl: apiBaseUrl,
+  );
 
-    // Retrieve permanent token
-    final verifier = Uri.parse(uri).queryParameters['oauth_verifier'] ?? '';
-    return client.retrieveAccessToken(verifier);
-  }).then((void v) {
-    // Example call
-    return client.apiGetJson('user');
-  }).then((dynamic decoded) {
+  client.apiGetJson('users/me').then((dynamic decoded) {
     // Example parsing of response
-    print(decoded['name']['formatted']);
-  });
-}
-```
-
-## Additional compatibilities
-
-This library features additional compatibility for the `flutter_web_auth_2` library.
-
-You can use both libraries together like this:
-```dart
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
-import 'package:studip/studip.dart' as studip;
-
-void main() {
-  // Initialize client
-  final client = studip.StudIPClient(
-      'https://studip.uni-passau.de/studip/dispatch.php/api',
-      'CONSUMER_KEY',
-      'CONSUMER_SECRET',
-      apiBaseUrl: 'https://studip.uni-passau.de/studip/api.php/');
-  client.getAuthorizationUrl('example://oauth_callback').then((String url) {
-    // Get verifier by calling the returned link and approve access
-    return FlutterWebAuth2.authenticate(url: url, callbackUrlScheme: 'example');
-  }).then((uri) {
-    // Retrieve permanent token
-    final verifier = Uri.parse(uri).queryParameters['oauth_verifier'] ?? '';
-    return client.retrieveAccessToken(verifier);
-  }).then((void v) {
-    // Example call
-    return client.apiGetJson('user');
-  }).then((dynamic decoded) {
-    // Example parsing of response
-    print(decoded['name']['formatted']);
+    print('${decoded['data']['attributes']['formatted-name']}');
   });
 }
 ```
