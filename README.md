@@ -13,7 +13,7 @@ Add to `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  studip: ^3.0.0-alpha.0
+  studip: ^3.0.0
 ```
 
 A simple usage example:
