@@ -4,7 +4,7 @@
   <a href="https://github.com/ThexXTURBOXx/dart-studip/actions/workflows/ci.yml"><img src="https://github.com/ThexXTURBOXx/dart-studip/actions/workflows/ci.yml/badge.svg"></a>
 </p>
 
-A library which provides simple access to Stud.IP's RestAPI services using
+A library which provides simple access to Stud.IP's JSON:API services using
  OAuth 2 authentication for Dart.
 
 ## Usage
