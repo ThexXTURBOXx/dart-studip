@@ -54,8 +54,11 @@ class StudIPClient {
   /// Returns the set client_secret or `null` if not set.
   String? get consumerSecret => _client.clientSecret;
 
+  /// Extracts and returns the current access token or `null` if not yet set.
   Future<String?> getToken() async => (await client.getToken())?.accessToken;
 
+  /// Enhances the given headers by adding the necessary Bearer token
+  /// authorization entry.
   Future<Map<String, String>> signHeaders([
     Map<String, String>? headers,
   ]) async =>
@@ -212,7 +215,7 @@ class StudIPClient {
     return res.body;
   }
 
-  /// Returns the body of the given `endpoint` in the specified RestAPI after
+  /// Returns the body of the given `endpoint` in the specified JSON:API after
   /// a GET request. To proper use, specify `apiBaseUrl`.
   Future<String> apiGet(
     String endpoint, {
@@ -220,7 +223,7 @@ class StudIPClient {
   }) async =>
       get(apiBaseUrl! + endpoint, headers: headers);
 
-  /// Returns the body of the given `endpoint` in the specified RestAPI after
+  /// Returns the body of the given `endpoint` in the specified JSON:API after
   /// a POST request. To proper use, specify `apiBaseUrl`.
   Future<String> apiPost(
     String endpoint, {
@@ -228,7 +231,7 @@ class StudIPClient {
   }) async =>
       post(apiBaseUrl! + endpoint, headers: headers);
 
-  /// Returns the body of the given `endpoint` in the specified RestAPI after
+  /// Returns the body of the given `endpoint` in the specified JSON:API after
   /// a PUT request. To proper use, specify `apiBaseUrl`.
   Future<String> apiPut(
     String endpoint, {
@@ -236,7 +239,7 @@ class StudIPClient {
   }) async =>
       put(apiBaseUrl! + endpoint, headers: headers);
 
-  /// Returns the body of the given `endpoint` in the specified RestAPI after
+  /// Returns the body of the given `endpoint` in the specified JSON:API after
   /// a DELETE request. To proper use, specify `apiBaseUrl`.
   Future<String> apiDelete(
     String endpoint, {
@@ -245,7 +248,7 @@ class StudIPClient {
       delete(apiBaseUrl! + endpoint, headers: headers);
 
   /// Returns the body decoded as JSON of the given `endpoint` in the
-  /// specified RestAPI after a GET request. To proper use, specify
+  /// specified JSON:API after a GET request. To proper use, specify
   /// `apiBaseUrl`.
   Future<dynamic> apiGetJson(
     String endpoint, {
@@ -254,7 +257,7 @@ class StudIPClient {
       json.decode(await apiGet(endpoint, headers: headers));
 
   /// Returns the body decoded as JSON of the given `endpoint` in the
-  /// specified RestAPI after a POST request. To proper use, specify
+  /// specified JSON:API after a POST request. To proper use, specify
   /// `apiBaseUrl`.
   Future<dynamic> apiPostJson(
     String endpoint, {
@@ -263,7 +266,7 @@ class StudIPClient {
       json.decode(await apiPost(endpoint, headers: headers));
 
   /// Returns the body decoded as JSON of the given `endpoint` in the
-  /// specified RestAPI after a PUT request. To proper use, specify
+  /// specified JSON:API after a PUT request. To proper use, specify
   /// `apiBaseUrl`.
   Future<dynamic> apiPutJson(
     String endpoint, {
@@ -272,7 +275,7 @@ class StudIPClient {
       json.decode(await apiPut(endpoint, headers: headers));
 
   /// Returns the body decoded as JSON of the given `endpoint` in the
-  /// specified RestAPI after a DELETE request. To proper use, specify
+  /// specified JSON:API after a DELETE request. To proper use, specify
   /// `apiBaseUrl`.
   Future<dynamic> apiDeleteJson(
     String endpoint, {
