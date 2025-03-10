@@ -15,7 +15,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Check format
-        run: dart format --output=none --set-exit-if-changed .
+        run: dart format --output=show --set-exit-if-changed .
 
   lint:
     name: Lint
@@ -25,8 +25,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Get dependencies for example
+      - name: Get dependencies
         run: flutter pub get
-        working-directory: example
       - name: Lint using flutter analyze
         run: flutter analyze
