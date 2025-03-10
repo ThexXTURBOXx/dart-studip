@@ -18,6 +18,9 @@ jobs:
         with:
           channel: 'stable'
 
+      - name: Setup Pana
+        run: flutter pub global activate pana
+
       - name: Get dependencies
         run: flutter pub get
 
@@ -26,3 +29,6 @@ jobs:
 
       - name: Analyze
         run: dart analyze
+
+      - name: Pana
+        run: pana
