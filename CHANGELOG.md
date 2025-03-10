@@ -1,3 +1,9 @@
+## 3.0.1
+
+- Fix CI and a few other related errors
+- Fix factual errors in README and documentation
+- 100% documentation coverage
+
 ## 3.0.0
 
 - Stabilise API and upgrade dependencies to official versions
