@@ -1,3 +1,7 @@
+## 3.0.2
+
+- Add `flutter` as explicit dependency to (hopefully) fix `pana` on pub.dev
+
 ## 3.0.1
 
 - Fix CI and a few other related errors
