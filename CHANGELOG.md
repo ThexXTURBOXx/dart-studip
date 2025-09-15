@@ -1,3 +1,7 @@
+## 3.0.3
+
+- Update `\[flutter_\]lints`
+
 ## 3.0.2
 
 - Add `flutter` as explicit dependency to (hopefully) fix `pana` on pub.dev
