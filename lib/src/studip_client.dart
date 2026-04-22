@@ -33,17 +33,18 @@ class StudIPClient {
     required String clientId,
     String? clientSecret,
     TokenStorage? tokenStorage,
+    http.Client? httpClient,
     this.apiBaseUrl,
   }) : _client = OAuth2Helper(
-          StudIPOAuth2Client(
-            baseUrl: oAuthBaseUrl,
-            redirectUri: redirectUri,
-            customUriScheme: customUriScheme,
-          ),
-          clientId: clientId,
-          clientSecret: clientSecret,
-          tokenStorage: tokenStorage,
-        );
+            StudIPOAuth2Client(
+              baseUrl: oAuthBaseUrl,
+              redirectUri: redirectUri,
+              customUriScheme: customUriScheme,
+            ),
+            clientId: clientId,
+            clientSecret: clientSecret,
+            tokenStorage: tokenStorage,
+            httpClient: httpClient);
 
   /// Returns the current OAuth client.
   OAuth2Helper get client => _client;
