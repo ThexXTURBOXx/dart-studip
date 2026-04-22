@@ -5,6 +5,9 @@ import 'package:oauth2_client/interfaces.dart';
 import 'package:oauth2_client/oauth2_helper.dart';
 import 'package:studip/src/studip_oauth2_client.dart';
 
+/// This is used to fix a 406 error. Without this, Stud.IP behaves weirdly.
+const Map<String, String> _acceptHeaderFix = {'Accept': '*/*'};
+
 /// Provides simple-to-use access to Stud.IP's JSON:API over OAuth 2.
 class StudIPClient {
   /// The client with access to the JSON:API using the retrieved OAuth 2.0
@@ -15,9 +18,6 @@ class StudIPClient {
   /// highly advised to specify due to enabling the proper use of all `api*`
   /// methods in this class.
   final String? apiBaseUrl;
-
-  /// This is used to fix a 406 error. Without this, Stud.IP behaves weirdly.
-  final Map<String, String> _acceptHeaderFix = {'Accept': '*/*'};
 
   /// The `oAuthBaseUrl` points to the OAuth base url. The `clientId` and
   /// `clientSecret` are the OAuth 2.0 client_id and client_secret. These are
