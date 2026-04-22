@@ -1,3 +1,7 @@
+## 3.1.0
+
+- Update `oauth2_client` for better http client management
+
 ## 3.0.3
 
 - Update `\[flutter_\]lints`
