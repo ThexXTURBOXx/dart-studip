@@ -56,7 +56,7 @@ class StudIPClient {
   String? get consumerSecret => _client.clientSecret;
 
   /// Extracts and returns the current access token or `null` if not yet set.
-  Future<String?> getToken() async => (await client.getToken())?.accessToken;
+  Future<String?> getToken() async => (await client.getToken()).accessToken;
 
   /// Enhances the given headers by adding the necessary Bearer token
   /// authorization entry.
