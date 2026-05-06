@@ -1,3 +1,7 @@
+## 3.1.1
+
+- Cleanup token handling
+
 ## 3.1.0
 
 - Update `oauth2_client` for better http client management
