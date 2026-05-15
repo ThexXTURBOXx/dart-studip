@@ -1,3 +1,7 @@
+## 3.1.2
+
+- Future-proofing for `oauth2_client` alpha
+
 ## 3.1.1
 
 - Cleanup token handling
